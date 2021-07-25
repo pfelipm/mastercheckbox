@@ -37,8 +37,7 @@ function onEdit(e) {
         else {
           isUpperCheckbox = true;
         }
-      }
-      else { // row = 1
+      } else { // row = 1
         isUpperCheckbox = true;
       }
 
