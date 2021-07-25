@@ -46,7 +46,7 @@ function onEdit(e) {
         // All conditions cleared, go ahead!
 
         const value = range.getValue();
-        SpreadsheetApp.getActive().toast(`Master checkbox change detected at R${masterRow}C${masterCol} value ${value}`);
+        // SpreadsheetApp.getActive().toast(`Master checkbox change detected at R${masterRow}C${masterCol} value ${value}`);
 
         const expandedRange = range.getDataRegion(SpreadsheetApp.Dimension.ROWS);
         const lowerRow = masterRow + expandedRange.getNumRows() - 1;
