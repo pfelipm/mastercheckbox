@@ -1,3 +1,12 @@
+/**
+ * Uses an onEdit() simple trigger to monitor the status of checkboxes in the spreadsheet and
+ * toggles all contiguous checkboxes immediately below (same column) accordingly.
+ * 
+ * Copyright (C) Pablo Felip (@pfelipm) · Se distribuye bajo licencia MIT.
+ * 
+ * @OnlyCurrentDoc
+ */
+
 function onEdit(e) {
 
   // Get edited range
