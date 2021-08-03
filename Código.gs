@@ -22,13 +22,14 @@ function onEdit(e) {
     // Is it a checkbox?
 
     const isCheckbox = range.getDataValidation().getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX;
-    const masterRow = range.getRow();
-    const masterCol = range.getColumn();
+
     if (isCheckbox) {
     
       // Is this checkbox at the top row of a 1-column checkbox interval?
 
       let isUpperCheckbox;
+      const masterRow = range.getRow();
+      const masterCol = range.getColumn();
       if (masterRow > 1) {
         const dataValidation = range.offset(-1, 0).getDataValidation();
         if (dataValidation) {
@@ -46,8 +47,6 @@ function onEdit(e) {
         // All conditions cleared, go ahead!
 
         const value = range.getValue();
-        // SpreadsheetApp.getActive().toast(`Master checkbox change detected at R${masterRow}C${masterCol} value ${value}`);
-
         const expandedRange = range.getDataRegion(SpreadsheetApp.Dimension.ROWS);
         const lowerRow = masterRow + expandedRange.getNumRows() - 1;
         let actualLowerRow = masterRow + 1;
@@ -61,9 +60,11 @@ function onEdit(e) {
             actualLowerRow++;
           };
 
+          SpreadsheetApp.getActive().toast(`Master checkbox change detected at R${masterRow}C${masterCol} Lower row: ${actualLowerRow - 1} value ${value}`);
+
           // Check / uncheck accordingly
 
-          expandedRange.offset(1, 0, actualLowerRow - 2, 1).setValue(value);
+          expandedRange.offset(1, 0, actualLowerRow - masterRow - 1, 1).setValue(value);
           // SpreadsheetApp.flush();
 
         }
