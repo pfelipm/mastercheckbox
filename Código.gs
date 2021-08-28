@@ -10,67 +10,62 @@
 function onEdit(e) {
 
   // Get edited range
-
   const range = e.range;
-  const rows = range.getNumRows();
-  const cols = range.getNumColumns();
 
   // Single cell edit?
-
-  if (rows == 1 && cols == 1) {
+  if (range.getNumRows() == 1 && range.getNumColumns() == 1) {
     
     // Is it a checkbox?
-
     let dataValidation = range.getDataValidation(); // getDataValidation() may return null!
     const isCheckbox = dataValidation ? dataValidation.getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX : false;
 
     if (isCheckbox) {
     
       // Has this checkbox another one immediately above?
-
       let isUpperCheckbox;
       const masterRow = range.getRow();
       if (masterRow > 1) {
+
         dataValidation = range.offset(-1, 0).getDataValidation();
         isUpperCheckbox = dataValidation ?
                           !range.offset(-1, 0).getDataValidation().getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX :
                           true;
-
       } else { // row = 1
         isUpperCheckbox = true;
       }
 
+      // If all conditions met, let's find how many checkboxes immediately below.
       if (isUpperCheckbox) {
 
-        // All conditions cleared, let's find how many checkboxes immediately below.
-
-        const value = range.getValue();
+        // Grow range vertically to contain all contiguous non-blank cells  
         const expandedRange = range.getDataRegion(SpreadsheetApp.Dimension.ROWS);
+
+        // Calculate position of masterRow and last row inside expanded range to check downwards
+        const expandedRangeRow = expandedRange.getRow();
+        const startRow = masterRow - expandedRangeRow + 2;
         const lowerRow = expandedRange.getNumRows();
 
-        // Grow range to include all contiguous checkboxes immediately below the one that has been edited, if any
+        
+        if (lowerRow >= startRow) {
 
-        if (lowerRow > masterRow) {
-
-          const dataValidations = expandedRange.getDataValidations();          
-          let lastCheckboxFound = false;
+          const dataValidations = expandedRange.getDataValidations();        
           let actualLowerRow;
-          for (actualLowerRow = masterRow + 1; actualLowerRow <= lowerRow; actualLowerRow++) {
+          for (actualLowerRow = startRow; actualLowerRow <= lowerRow; actualLowerRow++) {
+
             dataValidation = dataValidations[actualLowerRow - 1][0];
             const lastCheckboxFound = dataValidation ?
                                       dataValidation.getCriteriaType() != SpreadsheetApp.DataValidationCriteria.CHECKBOX :
                                       true;
             if (lastCheckboxFound) break;
+
           }
 
           // Check or uncheck accordingly
-
-          const numCheckboxes = actualLowerRow - 1 - masterRow;
+          const numCheckboxes = actualLowerRow - startRow;
           if (numCheckboxes > 0) {
             
-            console.info(masterRow + 1, masterRow + numCheckboxes);
             SpreadsheetApp.getActive().toast('Conmutando casillas de verificación...','',2);
-            range.offset(1, 0, actualLowerRow - 1 - masterRow, 1).setValue(value);
+            range.offset(1, 0, actualLowerRow - startRow, 1).setValue(range.getValue());
             // SpreadsheetApp.flush();
           
           }
