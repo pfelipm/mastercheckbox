@@ -44,7 +44,6 @@ function onEdit(e) {
         const expandedRangeRow = expandedRange.getRow();
         const startRow = masterRow - expandedRangeRow + 2;
         const lowerRow = expandedRange.getNumRows();
-
         
         if (lowerRow >= startRow) {
 
