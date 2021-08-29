@@ -7,66 +7,98 @@
  * @OnlyCurrentDoc
  */
 
+function foo() {
+  PropertiesService.getUserProperties().deleteProperty('masterCheckboxes');
+}
+
+function onOpen() {
+
+  const masterSwitch = PropertiesService.getUserProperties().getProperty('masterCheckboxes') ?? 'off';
+  SpreadsheetApp.getUi().createMenu('Master checkboxes')
+    .addItem(masterSwitch == 'on' ?
+             '🟢 Disable master checkboxes for me' :
+             '🟠 Enable master checkboxes for me', 'toggleMasterCheckboxes')
+    .addToUi();
+
+}
+
+function toggleMasterCheckboxes() {
+
+  const masterSwitch = PropertiesService.getUserProperties().getProperty('masterCheckboxes') ?? 'off';
+  if (masterSwitch == 'on') {
+    PropertiesService.getUserProperties().setProperty('masterCheckboxes', 'off');
+  } else {
+    PropertiesService.getUserProperties().setProperty('masterCheckboxes', 'on');
+  }
+  onOpen();
+
+}
+
 function onEdit(e) {
 
   // Get edited range
   const range = e.range;
 
-  // Single cell edit?
-  if (range.getNumRows() == 1 && range.getNumColumns() == 1) {
-    
-    // Is it a checkbox?
-    let dataValidation = range.getDataValidation(); // getDataValidation() may return null!
-    const isCheckbox = dataValidation ? dataValidation.getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX : false;
+  // Master checkboxes enabled for current user?
+  const masterSwitch = PropertiesService.getUserProperties().getProperty('masterCheckboxes') ?? 'off';
+  if (masterSwitch == 'on') {
 
-    if (isCheckbox) {
-    
-      // Has this checkbox another one immediately above?
-      let isUpperCheckbox;
-      const masterRow = range.getRow();
-      if (masterRow > 1) {
+    // Single cell edit?
+    if (range.getNumRows() == 1 && range.getNumColumns() == 1) {
+      
+      // Is it a checkbox?
+      let dataValidation = range.getDataValidation(); // getDataValidation() may return null!
+      const isCheckbox = dataValidation ? dataValidation.getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX : false;
 
-        dataValidation = range.offset(-1, 0).getDataValidation();
-        isUpperCheckbox = dataValidation ?
-                          !range.offset(-1, 0).getDataValidation().getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX :
-                          true;
-      } else { // row = 1
-        isUpperCheckbox = true;
-      }
+      if (isCheckbox) {
+      
+        // Has this checkbox another one immediately above?
+        let isUpperCheckbox;
+        const masterRow = range.getRow();
+        if (masterRow > 1) {
 
-      // If all conditions met, let's find how many checkboxes immediately below.
-      if (isUpperCheckbox) {
+          dataValidation = range.offset(-1, 0).getDataValidation();
+          isUpperCheckbox = dataValidation ?
+                            !range.offset(-1, 0).getDataValidation().getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX :
+                            true;
+        } else { // row = 1
+          isUpperCheckbox = true;
+        }
 
-        // Grow range vertically to contain all contiguous non-blank cells  
-        const expandedRange = range.getDataRegion(SpreadsheetApp.Dimension.ROWS);
+        // If all conditions met, let's find how many checkboxes immediately below.
+        if (isUpperCheckbox) {
 
-        // Calculate position of masterRow and last row inside expanded range to check downwards
-        const expandedRangeRow = expandedRange.getRow();
-        const startRow = masterRow - expandedRangeRow + 2;
-        const lowerRow = expandedRange.getNumRows();
-        
-        if (lowerRow >= startRow) {
+          // Grow range vertically to contain all contiguous non-blank cells  
+          const expandedRange = range.getDataRegion(SpreadsheetApp.Dimension.ROWS);
 
-          const dataValidations = expandedRange.getDataValidations();        
-          let actualLowerRow;
-          for (actualLowerRow = startRow; actualLowerRow <= lowerRow; actualLowerRow++) {
-
-            dataValidation = dataValidations[actualLowerRow - 1][0];
-            const lastCheckboxFound = dataValidation ?
-                                      dataValidation.getCriteriaType() != SpreadsheetApp.DataValidationCriteria.CHECKBOX :
-                                      true;
-            if (lastCheckboxFound) break;
-
-          }
-
-          // Check or uncheck accordingly
-          const numCheckboxes = actualLowerRow - startRow;
-          if (numCheckboxes > 0) {
-            
-            SpreadsheetApp.getActive().toast(`Conmutando casillas de verificación (${numCheckboxes}).`,'',2);
-            range.offset(1, 0, actualLowerRow - startRow, 1).setValue(range.getValue());
-            // SpreadsheetApp.flush();
+          // Calculate position of masterRow and last row inside expanded range to check downwards
+          const expandedRangeRow = expandedRange.getRow();
+          const startRow = masterRow - expandedRangeRow + 2;
+          const lowerRow = expandedRange.getNumRows();
           
+          if (lowerRow >= startRow) {
+
+            const dataValidations = expandedRange.getDataValidations();        
+            let actualLowerRow;
+            for (actualLowerRow = startRow; actualLowerRow <= lowerRow; actualLowerRow++) {
+
+              dataValidation = dataValidations[actualLowerRow - 1][0];
+              const lastCheckboxFound = dataValidation ?
+                                        dataValidation.getCriteriaType() != SpreadsheetApp.DataValidationCriteria.CHECKBOX :
+                                        true;
+              if (lastCheckboxFound) break;
+
+            }
+
+            // Check or uncheck accordingly
+            const numCheckboxes = actualLowerRow - startRow;
+            if (numCheckboxes > 0) {
+              
+              SpreadsheetApp.getActive().toast(`Conmutando casillas de verificación (${numCheckboxes}).`,'',2);
+              range.offset(1, 0, actualLowerRow - startRow, 1).setValue(range.getValue());
+              // SpreadsheetApp.flush();
+            
+            }
           }
         }
       }
