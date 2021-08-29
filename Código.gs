@@ -44,7 +44,9 @@ function onEdit(e) {
       
       // Is it a checkbox?
       let dataValidation = range.getDataValidation(); // getDataValidation() may return null!
-      const isCheckbox = dataValidation ? dataValidation.getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX : false;
+      const isCheckbox = dataValidation ?
+                         dataValidation.getCriteriaType() == SpreadsheetApp.DataValidationCriteria.CHECKBOX :
+                         false;
 
       if (isCheckbox) {
       
