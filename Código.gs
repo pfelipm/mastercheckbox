@@ -7,10 +7,6 @@
  * @OnlyCurrentDoc
  */
 
-function foo() {
-  PropertiesService.getUserProperties().deleteProperty('masterCheckboxes');
-}
-
 function onOpen() {
 
   const masterSwitch = PropertiesService.getUserProperties().getProperty('masterCheckboxes') ?? 'off';
