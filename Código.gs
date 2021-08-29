@@ -63,7 +63,7 @@ function onEdit(e) {
           const numCheckboxes = actualLowerRow - startRow;
           if (numCheckboxes > 0) {
             
-            SpreadsheetApp.getActive().toast(`Conmutando casillas de verificación (${numCheckboxes})`,'',2);
+            SpreadsheetApp.getActive().toast(`Conmutando casillas de verificación (${numCheckboxes}).`,'',2);
             range.offset(1, 0, actualLowerRow - startRow, 1).setValue(range.getValue());
             // SpreadsheetApp.flush();
           
