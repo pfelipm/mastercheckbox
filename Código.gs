@@ -32,12 +32,12 @@ function toggleMasterCheckboxes() {
 
 function onEdit(e) {
 
-  // Get edited range
-  const range = e.range;
-
   // Master checkboxes enabled for current user?
   const masterSwitch = PropertiesService.getUserProperties().getProperty('masterCheckboxes') ?? 'off';
   if (masterSwitch == 'on') {
+
+    // Get edited range
+    const range = e.range;
 
     // Single cell edit?
     if (range.getNumRows() == 1 && range.getNumColumns() == 1) {
