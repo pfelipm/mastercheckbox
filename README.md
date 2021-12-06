@@ -1,5 +1,6 @@
 ![](https://user-images.githubusercontent.com/12829262/131243963-5b57a584-9be6-4e99-87b3-1e6303362e26.png)
-![Creado con - Google Apps Script](https://img.shields.io/static/v1?label=Creado+con&message=Google+Apps+Script&color=blue&style=for-the-badge&logo=GAS)
+[![Creado con - Google Apps Script](https://img.shields.io/static/v1?label=Creado+con&message=Google+Apps+Script&color=blue&logo=GAS)](https://developers.google.com/apps-script)
+
 # Master Checkboxes
 
 Este repositorio sirve de acompañamiento al artículo "[Casillas de verificación maestras para las hojas de cálculo de Google con Apps Script](https://pablofelip.online/master-checkboxes-appsscript/)". Pégale una leída para entender de qué va esto y cómo puedes usar este script en tus propios proyectos.
